@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import Counter from "./components/Counter";
 import ClassCounter from "./components/classCounter";
 import './styles/App.css'
@@ -19,6 +19,22 @@ function App(){
     ]);
 
     const [selectedSort, setSelectedSort] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
+
+
+    const sortedPosts = useMemo(() => {
+        if (selectedSort){
+            return [...posts].sort((a, b) => a[selectedSort].localeCompare(b[selectedSort]))
+        }
+
+        return posts;
+    }, [selectedSort, posts]);
+
+    const sortedAndSearchedPosts = useMemo(() => {
+        return sortedPosts.filter(post => post.title.toLowerCase().includes(searchQuery));
+    }, [searchQuery, sortedPosts])
+
+
     const createPost = (newPost) => {
         setPosts([...posts, newPost])
     }
@@ -31,7 +47,7 @@ function App(){
     const sortPosts = (sort) => {
         setSelectedSort(sort);
         console.log(sort);
-        setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
+        // setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
     }
 
     return(
@@ -39,6 +55,11 @@ function App(){
             <PostForm create={createPost}/>
             <hr style={{margin: '15px 0'}}/>
             <div>
+                <MyInput
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search.."
+                />
                 <MySelect
                     value={selectedSort}
                     onChange={sortPosts}
@@ -50,8 +71,8 @@ function App(){
 
                 />
             </div>
-            {posts.length !== 0
-                ? <PostList remove={removePost} posts={posts} title={"Posts"}/>
+            {sortedAndSearchedPosts.length !== 0
+                ? <PostList remove={removePost} posts={sortedAndSearchedPosts} title={"Posts"}/>
 
                 : <h1 style={{textAlign: 'center'}}> Posts not found</h1>
             }
