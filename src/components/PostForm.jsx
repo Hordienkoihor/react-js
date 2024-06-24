@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import MyInput from "./UI/input/MyInput";
 import MyButton from "./UI/button/MyButton";
 import PostList from "./PostList";
+import PostFilter from "./PostFilter";
 
 const PostForm = ({create}) => {
 
